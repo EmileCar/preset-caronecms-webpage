@@ -1,13 +1,12 @@
 import type { Editor, BlockProperties } from 'grapesjs';
-import { RequiredPluginOptions } from '.';
+import { PluginOptions } from './types/PluginOptions';
 
-export default (editor: Editor, opts: RequiredPluginOptions) => {
+export default (editor: Editor, opts: Required<PluginOptions>) => {
   const addBlock = (id: string, def: BlockProperties) => {
     opts.blocks.indexOf(id)! >= 0 && editor.Blocks.add(id, {
       select: true,
       category: 'Basic',
       ...def,
-      ...opts.block(id),
     });
   }
 

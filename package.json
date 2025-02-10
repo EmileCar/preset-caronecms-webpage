@@ -1,6 +1,6 @@
 {
-  "name": "grapesjs-preset-webpage",
-  "version": "1.0.3",
+  "name": "grapesjs-preset-caronecms-webpage",
+  "version": "1.0.6",
   "description": "GrapesJS Plugin Webpage Preset",
   "main": "dist/index.js",
   "files": [

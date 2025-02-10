@@ -2,131 +2,74 @@ import type { Editor, Plugin } from 'grapesjs';
 import blocks from './blocks';
 import commands from './commands';
 import panels from './panels';
-
-export type PluginOptions = {
-  /**
-   * Which blocks to add.
-   * @default ['link-block', 'quote', 'text-basic']
-   */
-  blocks?: string[];
-
-  /**
-   * Add custom block options, based on block id.
-   * @default (blockId) => ({})
-   * @example (blockId) => blockId === 'quote' ? { attributes: {...} } : {};
-   */
-  block?: (blockId: string) => ({});
-
-  /**
-   * Modal import title.
-   * @default 'Import'
-   */
-  modalImportTitle?: string;
-
-  /**
-   * Modal import button text.
-   * @default 'Import'
-   */
-  modalImportButton?: string;
-
-  /**
-   * Import description inside import modal.
-   * @default ''
-   */
-  modalImportLabel?: string;
-
-  /**
-   * Default content to setup on import model open.
-   * Could also be a function with a dynamic content return (must be a string).
-   * @default ''
-   * @example editor => editor.getHtml()
-   */
-  modalImportContent?: string | ((editor: Editor) => string);
-
-  /**
-   * Code viewer (eg. CodeMirror) options.
-   * @default {}
-   */
-  importViewerOptions?: Record<string, any>;
-
-  /**
-   * Confirm text before clearing the canvas.
-   * @default 'Are you sure you want to clear the canvas?'
-   */
-  textCleanCanvas?: string;
-
-  /**
-   * Show the Style Manager on component change.
-   * @default true
-   */
-  showStylesOnChange?: boolean;
-
-  /**
-   * Load custom preset theme.
-   * @default true
-   */
-  useCustomTheme?: boolean;
-};
-
-export type RequiredPluginOptions = Required<PluginOptions>;
+import { PluginOptions } from './types/PluginOptions';
+import { UIStyleOptions } from './types/UIStyleOptions';
 
 const plugin: Plugin<PluginOptions> = (editor, opts: Partial<PluginOptions> = {}) => {
-  const config: RequiredPluginOptions = {
-    blocks: ['link-block', 'quote', 'text-basic'],
-    block: () => ({}),
-    modalImportTitle: 'Import',
-    modalImportButton: 'Import',
-    modalImportLabel: '',
-    modalImportContent: '',
-    importViewerOptions: {},
-    textCleanCanvas: 'Are you sure you want to clear the canvas?',
-    showStylesOnChange: true,
-    useCustomTheme: true,
-    ...opts,
-  };
+	const config: Required<PluginOptions> = {
+		blocks: ['link-block', 'quote', 'text-basic'],
+		modalImportTitle: 'Import',
+		modalImportButton: 'Import',
+		modalImportLabel: '',
+		modalImportContent: '',
+		importViewerOptions: {},
+		textCleanCanvas: 'Are you sure you want to clear the canvas?',
+		showStylesOnChange: true,
+		customTheme: {
+			primaryColor: '#272727',
+			secondaryColor: '#f0f0f0',
+			tertiaryColor: 'grey',
+			quaternaryColor: '#4198ff',
+			activeColor: '#404040',
+		},
+		...opts,
+	};
 
-  if (config.useCustomTheme && typeof window !== 'undefined') {
-    const primaryColor = '#463a3c';
-    const secondaryColor = '#b9a5a6';
-    const tertiaryColor = '#804f7b';
-    const quaternaryColor = '#d97aa6';
-    const prefix = 'gjs-';
-    let cssString = '';
+	const requiredStyleConfig = config.customTheme as Required<UIStyleOptions>;
+	setupStyle(requiredStyleConfig);
 
-    [
-      ['one', primaryColor],
-      ['two', secondaryColor],
-      ['three', tertiaryColor],
-      ['four', quaternaryColor],
-    ].forEach(([cnum, ccol]) => {
-      cssString += `
-        .${prefix}${cnum}-bg {
-          background-color: ${ccol};
-        }
+	// Load blocks
+	blocks(editor, config);
 
-        .${prefix}${cnum}-color {
-          color: ${ccol};
-        }
+	// Load commands
+	commands(editor, config);
 
-        .${prefix}${cnum}-color-h:hover {
-          color: ${ccol};
-        }
-      `;
-    });
+	// Load panels
+	panels(editor, config);
+}
 
-    const style = document.createElement('style');
-    style.innerText = cssString;
-    document.head.appendChild(style);
-  }
+const setupStyle = (config: Required<UIStyleOptions>) => {
+	const prefix = 'gjs-';
+	let cssString = '';
 
-  // Load blocks
-  blocks(editor, config);
+	[
+		['one', config.primaryColor],
+		['two', config.secondaryColor],
+		['three', config.tertiaryColor],
+		['four', config.quaternaryColor],
+	].forEach(([cnum, ccol]) => {
+		cssString += `
+			.${prefix}${cnum}-bg {
+				background-color: ${ccol};
+			}
+			.${prefix}${cnum}-color {
+				color: ${ccol};
+			}
+			.${prefix}${cnum}-color-h:hover {
+				color: ${ccol};
+			}
+		`;
+	});
 
-  // Load commands
-  commands(editor, config);
+	cssString += `
+		.gjs-pn-btn.gjs-pn-active {
+			background-color: ${config.activeColor};
+		}
+	`;
 
-  // Load panels
-  panels(editor, config);
+	const style = document.createElement('style');
+	style.innerText = cssString;
+	document.head.appendChild(style);
 }
 
 export default plugin;

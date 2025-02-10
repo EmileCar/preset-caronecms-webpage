@@ -1,5 +1,4 @@
 import type { Editor } from 'grapesjs';
-import { RequiredPluginOptions } from '..';
 import {
   cmdClear,
   cmdDeviceDesktop,
@@ -7,8 +6,9 @@ import {
   cmdDeviceTablet,
 } from './../consts';
 import openImport from './openImport';
+import { PluginOptions } from '../types/PluginOptions';
 
-export default (editor: Editor, config: RequiredPluginOptions) => {
+export default (editor: Editor, config: Required<PluginOptions>) => {
   const { Commands } = editor;
   const txtConfirm = config.textCleanCanvas;
 
@@ -24,6 +24,10 @@ export default (editor: Editor, config: RequiredPluginOptions) => {
   });
   Commands.add(cmdDeviceMobile, {
     run: ed => ed.setDevice('Mobile portrait'),
+    stop: () => {},
+  });
+  Commands.add("edit-code", {
+    run: ed => ed.runCommand('open-code'),
     stop: () => {},
   });
   Commands.add(cmdClear, (e: Editor) => confirm(txtConfirm) && e.runCommand('core:canvas-clear'));
