@@ -50,9 +50,4 @@ export type PluginOptions = {
    * @default true
    */
   showStylesOnChange?: boolean;
-
-  /**
-   * Load custom preset theme.
-   */
-  customTheme?: Partial<UIStyleOptions>;
 };

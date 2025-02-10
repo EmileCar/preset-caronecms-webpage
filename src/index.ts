@@ -15,18 +15,8 @@ const plugin: Plugin<PluginOptions> = (editor, opts: Partial<PluginOptions> = {}
 		importViewerOptions: {},
 		textCleanCanvas: 'Are you sure you want to clear the canvas?',
 		showStylesOnChange: true,
-		customTheme: {
-			primaryColor: '#272727',
-			secondaryColor: '#f0f0f0',
-			tertiaryColor: 'grey',
-			quaternaryColor: '#4198ff',
-			activeColor: '#404040',
-		},
 		...opts,
 	};
-
-	const requiredStyleConfig = config.customTheme as Required<UIStyleOptions>;
-	setupStyle(requiredStyleConfig);
 
 	// Load blocks
 	blocks(editor, config);
