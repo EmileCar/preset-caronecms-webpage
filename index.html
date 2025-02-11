@@ -36,7 +36,7 @@
 
 					</div>
 					<div class="editor__header__wrapper--right">
-						
+
 					</div>
 				</div>
 			</div>
@@ -44,7 +44,7 @@
 				
 			</div>
 			<div class="editor__sidebar">
-
+				<div class="editor__sidebar__resizer"></div>
 			</div>
 			<div class="editor__canvas">
 				<div id="gjs" style="height:0px; overflow:hidden">
@@ -168,6 +168,62 @@
 							</svg>`
 						}
 				]});
+
+				editor.Panels.addPanel({
+					id: 'panel-right',
+					el: '.editor__header__wrapper--right',
+					buttons: [
+						{
+							id: "save-button",
+							className: "btn-save",
+							label: `<span class="gjs-pn-panel-icon fa fa-save"></span>`,
+							command(editor) {
+								const html = editor.getHtml();
+								const css = editor.getCss();
+								console.log("HTML:", html);
+								console.log("CSS:", css);
+								alert("Saved successfully!");
+							},
+						},
+					]
+				});
+
+
+				const $resizer = document.querySelector(".editor__sidebar__resizer");
+				const $sidebar = document.querySelector(".editor__sidebar");
+
+				function initResizerFn( resizer, sidebar ) {
+					var x, w;
+
+					function rs_mousedownHandler( e ) {
+
+						x = e.clientX;
+						var sbWidth = window.getComputedStyle( sidebar ).width;
+						w = parseInt( sbWidth, 10 );
+
+						document.addEventListener("mousemove", rs_mousemoveHandler);
+						document.addEventListener("mouseup", rs_mouseupHandler);
+					}
+
+					function rs_mousemoveHandler( e ) {
+						var dx = e.clientX - x;
+						var cw = w - dx;
+						if ( cw < 700 ) {
+							sidebar.style.width = `${ cw }px`;
+						}
+					}
+
+					function rs_mouseupHandler() {
+						document.removeEventListener("mouseup", rs_mouseupHandler);
+						document.removeEventListener("mousemove", rs_mousemoveHandler);
+					}
+
+					resizer.addEventListener("mousedown", rs_mousedownHandler);
+				}
+
+
+				initResizerFn( $resizer, $sidebar );
+
 			};
 		</script>
 	</body>
