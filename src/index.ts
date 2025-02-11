@@ -4,6 +4,7 @@ import commands from './commands';
 import panels from './panels';
 import { PluginOptions } from './types/PluginOptions';
 import { UIStyleOptions } from './types/UIStyleOptions';
+import GrapesJS from 'grapesjs';
 
 const plugin: Plugin<PluginOptions> = (editor, opts: Partial<PluginOptions> = {}) => {
 	const config: Required<PluginOptions> = {

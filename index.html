@@ -41,10 +41,13 @@
 				</div>
 			</div>
 			<div class="editor__sidebar__header">
-				
+
 			</div>
 			<div class="editor__sidebar">
 				<div class="editor__sidebar__resizer"></div>
+				<div id="layers-container" class="editor__manager-container"></div>
+    			<div id="styles-container" class="editor__manager-container" style="display: none;"></div>
+    			<div id="properties-container" class="editor__manager-container" style="display: none;"></div>
 			</div>
 			<div class="editor__canvas">
 				<div id="gjs" style="height:0px; overflow:hidden">
@@ -67,12 +70,13 @@
 							max-width: 700px;
 							border-radius: 3px;
 							padding: 30px 20px;
-							margin: 150px auto 0px;
+							margin: 0 auto 0px;
 							background-color: #d983a6;
 							box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.25);
 							color:rgba(255,255,255,0.75);
 							font: caption;
 							font-weight: 100;
+							height: 100%;
 						}
 				
 						.welcome {
@@ -120,9 +124,9 @@
 					storageManager: false,
 					container: '#gjs',
 					fromElement: true,
-					plugins: ['grapesjs-preset-webpage'],
+					plugins: ['grapesjs-preset-caronecms-webpage'],
 					pluginsOpts: {
-						'grapesjs-preset-webpage': {}
+						'grapesjs-preset-caronecms-webpage': {showStylesOnChange: false}
 					}
 				});
 
@@ -148,7 +152,6 @@
 						{
 							id: "set-device-desktop",
 							command: "set-device-desktop",
-							active: true,
 							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
 								<path fill="currentColor" d="M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z" />
 							</svg>`
@@ -174,6 +177,19 @@
 					el: '.editor__header__wrapper--right',
 					buttons: [
 						{
+							id: 'undo',
+							command: () => editor.runCommand('core:undo'),
+							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
+								<path fill="currentColor" d="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z" />
+							</svg>`
+							},{
+							id: 'redo',
+							command: () => editor.runCommand('core:redo'),
+							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
+								<path fill="currentColor" d="M10.5 18H18V20H10.5C6.91 20 4 17.09 4 13.5S6.91 7 10.5 7H16.17L13.08 3.91L14.5 2.5L20 8L14.5 13.5L13.09 12.09L16.17 9H10.5C8 9 6 11 6 13.5S8 18 10.5 18Z" />
+							</svg>`,
+							},
+							{
 							id: "save-button",
 							className: "btn-save",
 							label: `<span class="gjs-pn-panel-icon fa fa-save"></span>`,
@@ -188,6 +204,42 @@
 					]
 				});
 
+				editor.Panels.addPanel({
+					id: 'views',
+					el: '.editor__sidebar__header',
+					buttons: [
+						{
+							id: 'layers',
+							active: true,
+							className: 'editor__sidebar__button',
+							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
+	 								<path fill="currentColor" d="M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27M12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z" />
+								</svg>`,
+							commands: 'open-layers',
+						},
+						{
+							id: 'styles',
+							className: 'editor__sidebar__button',
+							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
+									<path fill="currentColor" d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z" />
+								</svg>`,
+							command: 'open-sm',
+						},
+						{
+							id: 'properties',
+							className: 'editor__sidebar__button',
+							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
+	 								<path fill="currentColor" d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+								</svg>`,
+							command: 'open-tm',
+						},
+					]
+				});
+
+				editor.Panels.addPanel({
+					id: 'views-container',
+					el: '.editor__sidebar',
+				})
 
 				const $resizer = document.querySelector(".editor__sidebar__resizer");
 				const $sidebar = document.querySelector(".editor__sidebar");
