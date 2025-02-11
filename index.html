@@ -126,7 +126,7 @@
 					fromElement: true,
 					plugins: ['grapesjs-preset-caronecms-webpage'],
 					pluginsOpts: {
-						'grapesjs-preset-caronecms-webpage': {showStylesOnChange: false}
+						'grapesjs-preset-caronecms-webpage': {}
 					}
 				});
 
@@ -152,6 +152,7 @@
 						{
 							id: "set-device-desktop",
 							command: "set-device-desktop",
+							active: true,
 							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
 								<path fill="currentColor" d="M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z" />
 							</svg>`
@@ -210,12 +211,11 @@
 					buttons: [
 						{
 							id: 'layers',
-							active: true,
 							className: 'editor__sidebar__button',
 							label: `<svg class="gjs-pn-panel-icon" viewBox="0 0 24 24">
 	 								<path fill="currentColor" d="M12,16L19.36,10.27L21,9L12,2L3,9L4.63,10.27M12,18.54L4.62,12.81L3,14.07L12,21.07L21,14.07L19.37,12.8L12,18.54Z" />
 								</svg>`,
-							commands: 'open-layers',
+							command: 'open-layers',
 						},
 						{
 							id: 'styles',
@@ -240,6 +240,23 @@
 					id: 'views-container',
 					el: '.editor__sidebar',
 				})
+
+				editor.on('load', () => {
+					const activeView = localStorage.getItem('active-sidebar-view') || 'layers';
+					editor.Panels.getButton('views', activeView).set('active', 1);
+				});
+
+				editor.on('run:open-layers', () => {
+					localStorage.setItem('active-sidebar-view', 'layers');
+				});
+
+				editor.on('run:open-sm', () => {
+					localStorage.setItem('active-sidebar-view', 'styles');
+				});
+
+				editor.on('run:open-tm', () => {
+					localStorage.setItem('active-sidebar-view', 'properties');
+				});
 
 				const $resizer = document.querySelector(".editor__sidebar__resizer");
 				const $sidebar = document.querySelector(".editor__sidebar");
